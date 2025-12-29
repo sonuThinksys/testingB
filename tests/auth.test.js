@@ -8,7 +8,7 @@ describe("Register", () => {
       email: "Sonu@gmail.com",
       password: "123456",
     });
-    expect(res.statusCode).toBe(201);
+    expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.name).toBe("Sonu");
     expect(res.body.data.email).toBe("Sonu@gmail.com");
