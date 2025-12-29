@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const pool = require("../db");
 const { hashPassword, comparePassword, validatePassword } = require("../utils/passwordUtils");
-const redisClient = require("../redis");
+// const redisClient = require("../redis");
 const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
@@ -25,7 +25,7 @@ exports.login = async (req, res) => {
       
       // Query user from PostgreSQL using raw SQL
       const result = await pool.query(
-        'SELECT name, email, password FROM "Users" WHERE email = $1',
+        'SELECT id, name, email, password FROM "Users" WHERE email = $1',
         [email]
       );
       if (result.rows.length === 0) {
@@ -34,6 +34,7 @@ exports.login = async (req, res) => {
       }
       
       const user = {
+        id: result.rows[0].id,
         name: result.rows[0].name,
         email: result.rows[0].email,
         password: result.rows[0].password,
@@ -49,6 +50,7 @@ exports.login = async (req, res) => {
       res.json({ 
         token, 
         user: { 
+          id: user.id,
           name: user.name, 
           email: user.email, 
         } 
@@ -95,28 +97,28 @@ exports.register = async (req, res) => {
       const hashedPassword = await hashPassword(password);
 
       const insertResult = await pool.query(
-        'INSERT INTO "Users" (name, email, password) VALUES ($1, $2, $3) RETURNING name, email',
+        'INSERT INTO "Users" (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
         [name, email, hashedPassword]
       );
-      
       const user = {
         name: insertResult.rows[0].name,
         email: insertResult.rows[0].email,
+        id: insertResult.rows[0].id,
       };
       const newUser = insertResult.rows[0];
 
     // 2️⃣ Update Redis cache
-    const cachedUsers = await redisClient.get("users");
+    // const cachedUsers = await redisClient.get("users");
 
-    if (cachedUsers) {
-      const users = JSON.parse(cachedUsers);
-      users.push(newUser);
-      await redisClient.setEx(
-        "users",
-        60,
-        JSON.stringify(users)
-      );
-    }
+    // if (cachedUsers) {
+    //   const users = JSON.parse(cachedUsers);
+    //   users.push(newUser);
+    //     // await redisClient.setEx(
+    //     //   "users",
+    //     //   60,
+    //     //   JSON.stringify(users)
+    //     // );
+    // }
       res.json(user);
     } catch (error) {
       console.error("Registration error:", error);

@@ -1,21 +1,21 @@
 const pool = require('../db');
-const redisClient = require("../redis");
+// const redisClient = require("../redis");
 const { hashPassword, validatePassword } = require("../utils/passwordUtils");
 
 exports.getUsers = async (req, res) => {
   try {
     console.time("redis_fetch");
-    const cachedUsers = await redisClient.get("users");
+    // const cachedUsers = await redisClient.get("users");
     console.timeEnd("redis_fetch");
-    if (cachedUsers) {
-      //fetch from redis cache
-      const users = JSON.parse(cachedUsers);
-      return res.status(200).json({
-        success: true,
-        data: users,
-        message: "Users fetched from cache"
-      });
-    }
+    // if (cachedUsers) {
+    //   //fetch from redis cache
+    //   const users = JSON.parse(cachedUsers);
+    //   return res.status(200).json({
+    //     success: true,
+    //     data: users,
+    //     message: "Users fetched from cache"
+    //   });
+    // }
     console.time("db_fetch");
     const result = await pool.query(
       'SELECT name, email FROM "Users"'
@@ -27,7 +27,7 @@ exports.getUsers = async (req, res) => {
       email: row.email,
     }));
     
-    await redisClient.set("users", JSON.stringify(users));
+    // await redisClient.set("users", JSON.stringify(users));
     return res.status(200).json({
       success: true,
       data: users,
@@ -42,8 +42,8 @@ exports.getUsers = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT name, email FROM "Users" WHERE email = $1',
-      [req.params.email] 
+      'SELECT name, email FROM "Users" WHERE id = $1',
+      [req.params.id] 
     );
     
     if (result.rows.length === 0) {
@@ -66,7 +66,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const result = await pool.query(
-      'DELETE FROM "Users" WHERE email = $1 RETURNING email',
+      'DELETE FROM "Users" WHERE id = $1 RETURNING id',
       [req.params.id]
     );
     
@@ -104,7 +104,7 @@ exports.updateUser = async (req, res) => {
     // If password is being updated, validate and hash it
     if (password) {
       const passwordValidation = validatePassword(password);
-      if (!passwordValidation.valid) {
+      if (!passwordValidation.valid) {  
         return res.status(400).json({ message: passwordValidation.message });
       }
       
@@ -123,7 +123,7 @@ exports.updateUser = async (req, res) => {
     const updateQuery = `
       UPDATE "Users" 
       SET ${updateFields.join(', ')} 
-      WHERE email = $${paramIndex}
+      WHERE id = $${paramIndex}
       RETURNING name, email
     `;
     

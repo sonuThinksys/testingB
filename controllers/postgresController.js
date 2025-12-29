@@ -1,5 +1,5 @@
 const pool = require('../postgres');
-const { redisClient, connectRedis } = require('../redis');
+// const { redisClient, connectRedis } = require('../redis');
 const bcrypt = require('bcryptjs');
 
 // Get all users
@@ -7,16 +7,16 @@ exports.getUsers = async (req, res) => {
   try {
     // Try cache, but fail soft if Redis is down
     try {
-      await connectRedis();
-      const cachedUsers = redisClient?.isOpen ? await redisClient.get("users") : null;
-      if (cachedUsers) {
-        res.json({
-          success: true,
-          data: JSON.parse(cachedUsers),
-          message: 'Users fetched from cache'
-        });
-        return;
-      }
+      // await connectRedis();
+      // const cachedUsers = redisClient?.isOpen ? await redisClient.get("users") : null;
+      // if (cachedUsers) {
+      //   res.json({
+      //     success: true,
+      //     data: JSON.parse(cachedUsers),
+      //     message: 'Users fetched from cache'
+      //   });
+      //   return;
+      // }
     } catch (cacheErr) {
       console.warn('Cache unavailable, continuing with DB:', cacheErr.message || cacheErr);
     }
