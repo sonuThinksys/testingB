@@ -46,9 +46,9 @@ exports.login = async (req, res) => {
       //   return res.status(400).json({ message: "Invalid password" });
       // }
     
-      const token = generateToken(user);
+      // const token = generateToken(user);
       res.json({ 
-        token, 
+        // token, 
         user: { 
           id: user.id,
           name: user.name, 
