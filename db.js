@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL       
+  connectionString: "postgresql://postgres:thinksys%40123@localhost:5432/secure_db"   
 });
 
 pool.on('error', (err) => {
