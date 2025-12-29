@@ -9,7 +9,17 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: thinksys@123
+          POSTGRES_DB: secure_db  
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
