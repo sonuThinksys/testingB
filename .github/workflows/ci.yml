@@ -31,9 +31,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      - name: Create .env
-        run: |
-          echo "DATABASE_URL=postgresql://postgres:thinksys%40123@localhost:5432/secure_db" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
       - name: Run tests
         run: npm test
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

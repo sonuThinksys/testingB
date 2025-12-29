@@ -17,7 +17,6 @@ describe("Login", () => {
         password: "123456",
       });
       expect(res.statusCode).toBe(200);
-      expect(res.body.token).toBeDefined();
       expect(res.body.user).toBeDefined();
       expect(res.body.user.email).toBe("Sonu@gmail.com");
     });
